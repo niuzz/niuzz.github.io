@@ -55,18 +55,20 @@
   };
 </script>
 
-  <meta name="description" content="一个关注技术和增长的记录，涉及Javascript、Golang、Python。各种增长模型、理论以及工具，流程建设等。">
+  <meta name="description" content="如果大家学习了一段 js 之后，多多少少会听到 js 三座大山的说法，三座大山指的是 作用域及闭包 原型链及继承 异步。既然叫三座大山，代表了这三个概念是 js 里面不得不翻的难点，今天先过作用域。js 在其他编程语言里，作用域作为一个基础概念，没有什么太多难度，但是在 js 里面一切变得不一样，归根结底还是因为 js（ES5） 没有块级作用域带来的问题。当然这个情况在ES6中得到了部分缓解。">
 <meta name="keywords" content="js基础">
 <meta property="og:type" content="article">
 <meta property="og:title" content="js基础-作用域">
 <meta property="og:url" content="http://www.niuzhuangzhi.com/2019/09/27/js基础-作用域/index.html">
 <meta property="og:site_name" content="Jason&#39;s 技术和增长">
-<meta property="og:description" content="一个关注技术和增长的记录，涉及Javascript、Golang、Python。各种增长模型、理论以及工具，流程建设等。">
+<meta property="og:description" content="如果大家学习了一段 js 之后，多多少少会听到 js 三座大山的说法，三座大山指的是 作用域及闭包 原型链及继承 异步。既然叫三座大山，代表了这三个概念是 js 里面不得不翻的难点，今天先过作用域。js 在其他编程语言里，作用域作为一个基础概念，没有什么太多难度，但是在 js 里面一切变得不一样，归根结底还是因为 js（ES5） 没有块级作用域带来的问题。当然这个情况在ES6中得到了部分缓解。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-09-27T15:29:18.248Z">
+<meta property="og:image" content="http://www.niuzhuangzhi.com/2019/09/27/js基础-作用域/%E6%89%A7%E8%A1%8C%E6%A0%88.png%27">
+<meta property="og:updated_time" content="2019-09-30T11:01:13.441Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="js基础-作用域">
-<meta name="twitter:description" content="一个关注技术和增长的记录，涉及Javascript、Golang、Python。各种增长模型、理论以及工具，流程建设等。">
+<meta name="twitter:description" content="如果大家学习了一段 js 之后，多多少少会听到 js 三座大山的说法，三座大山指的是 作用域及闭包 原型链及继承 异步。既然叫三座大山，代表了这三个概念是 js 里面不得不翻的难点，今天先过作用域。js 在其他编程语言里，作用域作为一个基础概念，没有什么太多难度，但是在 js 里面一切变得不一样，归根结底还是因为 js（ES5） 没有块级作用域带来的问题。当然这个情况在ES6中得到了部分缓解。">
+<meta name="twitter:image" content="http://www.niuzhuangzhi.com/2019/09/27/js基础-作用域/%E6%89%A7%E8%A1%8C%E6%A0%88.png%27">
   <link rel="canonical" href="http://www.niuzhuangzhi.com/2019/09/27/js基础-作用域/">
 
 
@@ -283,7 +285,85 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        
+        <p>如果大家学习了一段 js 之后，多多少少会听到 js 三座大山的说法，三座大山指的是 作用域及闭包 原型链及继承 异步。既然叫三座大山，代表了这三个概念是 js 里面不得不翻的难点，今天先过作用域。</p><p>js 在其他编程语言里，作用域作为一个基础概念，没有什么太多难度，但是在 js 里面一切变得不一样，归根结底还是因为 js（ES5） 没有块级作用域带来的问题。当然这个情况在ES6中得到了部分缓解。</p><a id="more"></a>
+
+<h3 id="0x00-知识点"><a href="#0x00-知识点" class="headerlink" title="0x00 知识点"></a>0x00 知识点</h3><ul>
+<li>块级作用域</li>
+<li>变量提升</li>
+<li>执行上下文</li>
+<li>闭包</li>
+</ul>
+<h3 id="0x01-块级作用域"><a href="#0x01-块级作用域" class="headerlink" title="0x01 块级作用域"></a>0x01 块级作用域</h3><p>总是说块级作用域，这个块是说的代码块，也就是一对 {} 包裹的内容。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(<span class="literal">true</span>) &#123;</span><br><span class="line">  <span class="keyword">var</span> name = <span class="string">'zz'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(name) <span class="comment">// zz</span></span><br></pre></td></tr></table></figure>
+
+<p>上面的代码中，一对 {} 包裹的 name 变量的赋值，在大多数语言中，这个 name 不会在 {} 外面被访问到，而在 js 中却可以。</p>
+<p>js 没有块级作用域，只有全局作用域和函数作用域。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> global = <span class="string">'global scoped'</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> global = <span class="string">'function scoped'</span>;</span><br><span class="line">    <span class="built_in">console</span>.log(global); <span class="comment">// function scoped</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn();</span><br><span class="line"><span class="built_in">console</span>.log(global); <span class="comment">// global scoped</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="0x02-变量和函数提升"><a href="#0x02-变量和函数提升" class="headerlink" title="0x02 变量和函数提升"></a>0x02 变量和函数提升</h3><p>变量声明会提升到作用域顶端执行</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(a); <span class="comment">// undefined</span></span><br><span class="line"><span class="keyword">var</span> a = <span class="number">123</span>;</span><br></pre></td></tr></table></figure>
+
+<p>上面的代码实际上相当于</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a;</span><br><span class="line"><span class="built_in">console</span>.log(a);</span><br><span class="line">a = <span class="number">123</span>;</span><br></pre></td></tr></table></figure>
+
+<p>函数也会提升</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">foo(); <span class="comment">//1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> foo;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">foo = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="number">2</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>思考下面的运行结果, 如果能明白就明白了提升了。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(v);<span class="comment">// undefined</span></span><br><span class="line"><span class="keyword">var</span> v = <span class="number">100</span>;</span><br><span class="line"><span class="built_in">console</span>.log(v);<span class="comment">// 100</span></span><br><span class="line"><span class="comment">// 当全局变量与局部变量同名时 - 在函数作用域中只能访问局部变量</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(v);<span class="comment">// undefined</span></span><br><span class="line">    <span class="keyword">var</span> v = <span class="number">200</span>;</span><br><span class="line">    <span class="built_in">console</span>.log(v);<span class="comment">// 200</span></span><br><span class="line">&#125;</span><br><span class="line">fn();</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(v);<span class="comment">// 100</span></span><br></pre></td></tr></table></figure>
+
+<p>输出结果</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//undefined</span></span><br><span class="line"><span class="comment">//100</span></span><br><span class="line"><span class="comment">//undefined</span></span><br><span class="line"><span class="comment">//200</span></span><br></pre></td></tr></table></figure>
+
+<p>函数提升是整个代码块提升到它所在作用域的最开始执行，函数优先。</p>
+<h3 id="0x03-执行上下文"><a href="#0x03-执行上下文" class="headerlink" title="0x03 执行上下文"></a>0x03 执行上下文</h3><p>函数执行的时候，会创建一个执行上下文的内部对象，可以理解为作用域，一个执行上下文定义了函数执行时的环境。</p>
+<p>每次调用执行上下文，都会分成2个阶段</p>
+<h4 id="创建阶段"><a href="#创建阶段" class="headerlink" title="创建阶段"></a>创建阶段</h4><p>创建阶段主要做3件事：</p>
+<ul>
+<li>创建作用域链</li>
+<li>创建变量对象 (函数形参，函数声明，变量声明)</li>
+<li>this</li>
+</ul>
+<p>代码模拟下</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params">i</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> a = <span class="string">'string'</span>;</span><br><span class="line">  <span class="keyword">var</span> b = <span class="function"><span class="keyword">function</span> <span class="title">private</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">c</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line">foo(<span class="number">100</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建的上下文对象示意如下：</span></span><br><span class="line">ExecutionContext = &#123;</span><br><span class="line">  scopeChain: &#123;&#125;, <span class="comment">// 作用域链</span></span><br><span class="line">  variableObject: &#123; <span class="comment">// 变量对象</span></span><br><span class="line">    <span class="built_in">arguments</span>: &#123;</span><br><span class="line">      <span class="number">0</span>: <span class="number">100</span>,</span><br><span class="line">      length: <span class="number">1</span></span><br><span class="line">    &#125;,</span><br><span class="line">    i: <span class="number">22</span>,</span><br><span class="line">    c: pointer to <span class="function"><span class="keyword">function</span> <span class="title">c</span>(<span class="params"></span>),</span></span><br><span class="line"><span class="function">    <span class="title">a</span>: <span class="title">undefined</span>,</span></span><br><span class="line"><span class="function">    <span class="title">b</span>: <span class="title">undefined</span></span></span><br><span class="line"><span class="function">  &#125;,</span></span><br><span class="line"><span class="function">  <span class="title">this</span>: </span>&#123;&#125; <span class="comment">// this</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="激活-代码执行阶段"><a href="#激活-代码执行阶段" class="headerlink" title="激活/代码执行阶段"></a>激活/代码执行阶段</h4><p>创建阶段负责处理定义属性的名字，不赋值。处理参数，一旦创建完成，执行流进入函数并激活代码执行阶段，ExecutionContext会更新</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">ExecutionContext = &#123;</span><br><span class="line">  scopeChain: &#123;&#125;, <span class="comment">// 作用域链</span></span><br><span class="line">  variableObject: &#123; <span class="comment">// 变量对象 VO</span></span><br><span class="line">    <span class="built_in">arguments</span>: &#123;</span><br><span class="line">      <span class="number">0</span>: <span class="number">100</span>,</span><br><span class="line">      length: <span class="number">1</span></span><br><span class="line">    &#125;,</span><br><span class="line">    i: <span class="number">22</span>,</span><br><span class="line">    c: pointer to <span class="function"><span class="keyword">function</span> <span class="title">c</span>(<span class="params"></span>),</span></span><br><span class="line"><span class="function">    <span class="title">a</span>: '<span class="title">string</span>',</span></span><br><span class="line"><span class="function">    <span class="title">b</span>: <span class="title">pointer</span> <span class="title">to</span> <span class="title">function</span> <span class="title">private</span>(<span class="params"></span>),</span></span><br><span class="line"><span class="function">  &#125;,</span></span><br><span class="line"><span class="function">  <span class="title">this</span>: </span>&#123;&#125; <span class="comment">// this</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这其中比较关键的是VO,VO是与上下文关联的特殊对象，用于存储上下文中的变量和函数声明</p>
+<p>VO初始化过程</p>
+<ul>
+<li>函数形参 当进入函数执行上下文时，属性名是形参的名字，值是实参的值，对于没有传递参数的是 undefined</li>
+<li>函数声明 其属性名和值都是函数对象创造出来的，如果变量对象包含了名字相同的属性，则替换它的值</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params">f</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(f)</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">f</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 函数形参优先级高于函数声明</span></span><br><span class="line"><span class="comment">// 即函数体内部声明的 function foo() &#123;&#125; 覆盖了函数形参 f 的声明</span></span><br><span class="line">foo(<span class="number">100</span>) <span class="comment">// function foo() &#123;&#125;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>变量声明</li>
+</ul>
+<p>变量对象的一个属性，其属性名为变量名，值为undefined， 如果变量名和已经声明的函数名或者函数形参名相同，则不会影响已经存在的属性, 即已存在的覆盖了。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 与参数名相同</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(a);</span><br><span class="line">  <span class="keyword">var</span> a = <span class="number">90</span>;</span><br><span class="line">&#125;</span><br><span class="line">foo(<span class="number">10</span>); <span class="comment">// 10</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 与函数名相同</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">bar</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(a);</span><br><span class="line">  <span class="keyword">var</span> a = <span class="number">90</span>;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">a</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line">bar() <span class="comment">// function a() &#123;&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="执行栈"><a href="#执行栈" class="headerlink" title="执行栈"></a>执行栈</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'1'</span>);</span><br><span class="line">  bar();</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'3'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">bar</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'2'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">foo();</span><br></pre></td></tr></table></figure>
+
+<p>将顺序打印1、2、3</p>
+<p><img src="//www.niuzhuangzhi.com/2019/09/27/js基础-作用域/%E6%89%A7%E8%A1%8C%E6%A0%88.png'" alt="执行栈"></p>
+<h3 id="0x04-闭包"><a href="#0x04-闭包" class="headerlink" title="0x04 闭包"></a>0x04 闭包</h3><p>什么是闭包？这个对于初学 js 是个非常难以理解的问题。这里不讲概念，就看现象</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">var</span> i=<span class="number">0</span>,arr=[];i&lt;=<span class="number">3</span>;i++) &#123;</span><br><span class="line">  arr.push(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;alert(i)&#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">arr[<span class="number">2</span>]();</span><br></pre></td></tr></table></figure>
+
+<p>这是经典的闭包题目, 实际上arr在循环里，是循环保存了函数定义的这个字符串，相当于循环执行了下面</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">arr.push(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;alert(i)&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>i 实际上是一个引用，只有在函数调用的时候才能确定，函数回去定义的地方找上下文中有没有 i， 而 i 早已经循环完毕</p>
+<p>修改成闭包之后</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">var</span> i=<span class="number">0</span>,arr=[];i&lt;=<span class="number">3</span>;i++) &#123;</span><br><span class="line"> arr.push(</span><br><span class="line">    <span class="keyword">return</span> (<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">      alert(i)</span><br><span class="line">    &#125;)(i)</span><br><span class="line">   );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>闭包返回的是自执行函数，将变量 i 作为匿名函数的参数传入到匿名函数所返回的事件处理函数中，因为函数执行，会有参数传递<br>arr.push实际上也将是下面形式</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> “<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;alert(” + para + “);&#125;”;</span><br></pre></td></tr></table></figure>
+
+<p>para 作为参数，从每次循环中得到正确的值。简单来说内部的变量保持了外部变量的值。</p>
+<p>优缺点，具体的理论网上都有，这里记录下这个问题是为更好的理解。还有setTimeout版本的，我理解更多的原因在异步。这是 event loop 的内容了</p>
+
     </div>
 
     
@@ -369,6 +449,8 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#0x00-知识点"><span class="nav-number">1.</span> <span class="nav-text">0x00 知识点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x01-块级作用域"><span class="nav-number">2.</span> <span class="nav-text">0x01 块级作用域</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x02-变量和函数提升"><span class="nav-number">3.</span> <span class="nav-text">0x02 变量和函数提升</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x03-执行上下文"><span class="nav-number">4.</span> <span class="nav-text">0x03 执行上下文</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建阶段"><span class="nav-number">4.1.</span> <span class="nav-text">创建阶段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#激活-代码执行阶段"><span class="nav-number">4.2.</span> <span class="nav-text">激活/代码执行阶段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#执行栈"><span class="nav-number">4.3.</span> <span class="nav-text">执行栈</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x04-闭包"><span class="nav-number">5.</span> <span class="nav-text">0x04 闭包</span></a></li></ol></div>
+        
       </div>
       <!--/noindex-->
 
